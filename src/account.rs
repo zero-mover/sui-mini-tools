@@ -6,7 +6,7 @@ use std::path::{Path,PathBuf};
 use serde::{Serialize, Deserialize};
 use sui_sdk::rpc_types::Coin;
 use sui_types::{ 
-    base_types::{SuiAddress,ObjectID}, 
+    base_types::SuiAddress, 
     crypto::{get_key_pair, EncodeDecodeBase64, SuiKeyPair},
 };
 use shared_crypto::intent::Intent;
@@ -96,7 +96,7 @@ pub  async fn send_tranfer_tx(
 
 
 
-pub fn batch_create_account(num_keypairs: usize,json_path: &str,key_store_file: &str)-> Result<(), anyhow::Error>{
+pub fn batch_create_account(num_keypairs: usize,json_path: &str,key_store_file: &str)-> Result<Vec<AddressKeyPair>, anyhow::Error>{
     //
     let mut file= if !Path::new(json_path).exists(){
         File::create(json_path)?
@@ -118,7 +118,7 @@ pub fn batch_create_account(num_keypairs: usize,json_path: &str,key_store_file: 
     };
     let json_str = serde_json::to_string_pretty(&json_pair_arr)?;
     file.write_all(json_str.as_bytes())?;
-    Ok(())
+    Ok(json_pair_arr)
 }
 
 
