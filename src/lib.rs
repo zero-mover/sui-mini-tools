@@ -1,10 +1,8 @@
 mod account;
 pub use account::{
     AddressKeyPair,
-    batch_generate_account,
     read_account_info,
     read_keypair,
-    build_tranfer_tx,
-    batch_generate_account_to_file,
-    batch_generate_account_to_key_store_file
+    send_tranfer_tx,
+    batch_create_account
 }; 
