@@ -22,6 +22,10 @@ use sui_sdk::{
     },
     SuiClient
 };
+use futures::{future, stream::StreamExt};
+use std::sync::Arc;
+
+
 
 #[derive(Serialize, Deserialize,Debug)]
 pub struct AddressKeyPair {
@@ -44,7 +48,7 @@ pub struct AddressKeyPair {
 
 pub  async fn send_tranfer_tx(
     client: &SuiClient,
-    path: &str,
+    path:&str,
     sender: SuiAddress,
     recipient: SuiAddress,
     amount: u64,
@@ -134,4 +138,20 @@ pub fn read_account_info(path: &str)-> Result<Vec<AddressKeyPair>, anyhow::Error
 pub fn read_keypair(keypair: &str) -> Result<SuiKeyPair,anyhow::Error> {
     // let contents = std::fs::read_to_string(path)?;
     SuiKeyPair::decode_base64(keypair.trim()).map_err(|e| anyhow!(e))
+}
+
+pub async fn fetch_coin(
+    sui: &SuiClient,
+    sender: &SuiAddress,
+) -> Result<Option<Coin>, anyhow::Error> {
+    let coin_type = "0x2::sui::SUI".to_string();
+    let coins_stream = sui
+        .coin_read_api()
+        .get_coins_stream(*sender, Some(coin_type));
+
+    let mut coins = coins_stream
+        .skip_while(|c| future::ready(c.balance < 5_000_000))
+        .boxed();
+    let coin = coins.next().await;
+    Ok(coin)
 }

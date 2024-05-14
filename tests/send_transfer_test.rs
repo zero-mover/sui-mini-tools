@@ -154,6 +154,7 @@ async fn test_send_tranfer_tx(){
 
     let receiver: SuiAddress=accounts[1].account.parse().unwrap();
     request_tokens_from_faucet(sender, &client).await.unwrap();
+    //wait select account
     tokio::time::sleep(Duration::from_secs(100)).await;
     let coin=fetch_coin(&client, &sender).await.unwrap().unwrap();
 
